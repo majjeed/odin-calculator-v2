@@ -16,6 +16,8 @@ function divide(a, b) {
 }
 
 function operate(operator, a, b) {
+  a = Number(a);
+  b = Number(b);
   switch (operator) {
     case "+":
       return add(a, b);
@@ -49,20 +51,33 @@ function logicFlow(target) {
   // if an operator has not been clicked yet then append or change firstOperand
   // else change secondOperand or append to it
 
-  if (targetClass === "digit") {
+  if (targetContent === "=" || targetContent === "C") {
+    if (target.id === "clear") {
+      firstOperand = null;
+      secondOperand = null;
+      currentOperator = null;
+      shouldResetDisplay = null;
+    } else {
+      let result = operate(currentOperator, firstOperand, secondOperand);
+      firstOperand = result;
+      currentOperator = null;
+      secondOperand = null;
+      return result;
+    }
+  } else if (targetClass === "digit") {
     if (currentOperator === null) {
       if (firstOperand === null) {
         firstOperand = targetContent;
       } else {
         // remember to string concat at this stage and not math add
-        firstOperand.concat(targetContent);
+        firstOperand = firstOperand.concat(targetContent);
       }
     } else {
       if (secondOperand === null) {
         secondOperand = targetContent;
       } else {
         // remember to string concat at this stage and not math add
-        secondOperand.concat(targetContent);
+        secondOperand = secondOperand.concat(targetContent);
       }
     }
   } else if (targetClass === "operator") {
@@ -70,7 +85,11 @@ function logicFlow(target) {
     if (currentOperator === null) {
       currentOperator = targetContent;
     } else {
-      return operate(currentOperator, firstOperand, secondOperand);
+      let result = operate(currentOperator, firstOperand, secondOperand);
+      firstOperand = result;
+      currentOperator = targetContent;
+      secondOperand = null;
+      return result;
     }
   }
 
