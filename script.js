@@ -56,19 +56,21 @@ function logicFlow(target) {
     currentOperator = null;
     shouldResetDisplay = false;
     resultMessage = "0";
-  } else if (targetContent === "=") {
-    let result = operate(currentOperator, firstOperand, secondOperand);
-    if (result === "Error") {
-      resultMessage = "Nope 🤨";
-      firstOperand = null;
-      secondOperand = null;
-      currentOperator = null;
-    } else {
-      resultMessage = result;
-      firstOperand = result;
-      secondOperand = null;
-      currentOperator = null;
-      shouldResetDisplay = true;
+  } else if (target.id === "equals") {
+    if (currentOperator && secondOperand !== null) {
+      let result = operate(currentOperator, firstOperand, secondOperand);
+      if (result === "Error") {
+        resultMessage = "Nope 🤨";
+        firstOperand = null;
+        secondOperand = null;
+        currentOperator = null;
+      } else {
+        resultMessage = roundResult(result);
+        firstOperand = resultMessage;
+        secondOperand = null;
+        currentOperator = null;
+        shouldResetDisplay = true;
+      }
     }
   } else if (targetClass === "digit") {
     if (shouldResetDisplay) {
@@ -92,15 +94,28 @@ function logicFlow(target) {
       currentOperator = targetContent;
     } else if (secondOperand !== null) {
       let result = operate(currentOperator, firstOperand, secondOperand);
-      firstOperand = result;
-      currentOperator = targetContent;
-      secondOperand = null;
-      resultMessage = result;
+      if (result === "Error") {
+        resultMessage = "Nope 🤨";
+        firstOperand = null;
+        secondOperand = null;
+        currentOperator = null;
+      } else {
+        resultMessage = roundResult(result);
+        firstOperand = resultMessage;
+        currentOperator = targetContent;
+        secondOperand = null;
+      }
+    } else {
+      currentOperator = targetContent; // change operator if pressed twice
     }
   }
 
   // update display safely
   display.textContent = resultMessage || secondOperand || firstOperand || "0";
 
-  return `firstOperand = ${firstOperand}; \n secondOperand = ${secondOperand}; \n currentOperator = ${currentOperator};`;
+  return `firstOperand = ${firstOperand}; \nsecondOperand = ${secondOperand}; \ncurrentOperator = ${currentOperator};`;
+}
+
+function roundResult(num) {
+  return Math.round(num * 100000) / 100000;
 }
