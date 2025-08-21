@@ -33,12 +33,12 @@ function operate(operator, a, b) {
 let firstOperand = null;
 let secondOperand = null;
 let currentOperator = null;
-let shouldResetDisplay = null;
+let shouldResetDisplay = false;
 
 let btnNodeList = document.querySelectorAll("button");
+let display = document.querySelector("#display");
 
-for (btn of btnNodeList) {
-  //btn.addEventListener("click", (e) => console.log(e.target.textContent));
+for (let btn of btnNodeList) {
   btn.addEventListener("click", (e) => {
     let result = logicFlow(e.target);
     console.log(result);
@@ -48,50 +48,59 @@ for (btn of btnNodeList) {
 function logicFlow(target) {
   let targetContent = target.textContent;
   let targetClass = target.className;
-  // if an operator has not been clicked yet then append or change firstOperand
-  // else change secondOperand or append to it
+  let resultMessage = "";
 
-  if (targetContent === "=" || targetContent === "C") {
-    if (target.id === "clear") {
+  if (target.id === "clear") {
+    firstOperand = null;
+    secondOperand = null;
+    currentOperator = null;
+    shouldResetDisplay = false;
+    resultMessage = "0";
+  } else if (targetContent === "=") {
+    let result = operate(currentOperator, firstOperand, secondOperand);
+    if (result === "Error") {
+      resultMessage = "Nope 🤨";
       firstOperand = null;
       secondOperand = null;
       currentOperator = null;
-      shouldResetDisplay = null;
     } else {
-      let result = operate(currentOperator, firstOperand, secondOperand);
+      resultMessage = result;
       firstOperand = result;
-      currentOperator = null;
       secondOperand = null;
-      return result;
+      currentOperator = null;
+      shouldResetDisplay = true;
     }
   } else if (targetClass === "digit") {
-    if (currentOperator === null) {
+    if (shouldResetDisplay) {
+      firstOperand = targetContent;
+      shouldResetDisplay = false;
+    } else if (currentOperator === null) {
       if (firstOperand === null) {
         firstOperand = targetContent;
       } else {
-        // remember to string concat at this stage and not math add
-        firstOperand = firstOperand.concat(targetContent);
+        firstOperand = firstOperand.toString().concat(targetContent);
       }
     } else {
       if (secondOperand === null) {
         secondOperand = targetContent;
       } else {
-        // remember to string concat at this stage and not math add
-        secondOperand = secondOperand.concat(targetContent);
+        secondOperand = secondOperand.toString().concat(targetContent);
       }
     }
   } else if (targetClass === "operator") {
-    //do something else for operators
     if (currentOperator === null) {
       currentOperator = targetContent;
-    } else {
+    } else if (secondOperand !== null) {
       let result = operate(currentOperator, firstOperand, secondOperand);
       firstOperand = result;
       currentOperator = targetContent;
       secondOperand = null;
-      return result;
+      resultMessage = result;
     }
   }
+
+  // update display safely
+  display.textContent = resultMessage || secondOperand || firstOperand || "0";
 
   return `firstOperand = ${firstOperand}; \n secondOperand = ${secondOperand}; \n currentOperator = ${currentOperator};`;
 }

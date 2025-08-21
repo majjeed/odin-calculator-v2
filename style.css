@@ -23,11 +23,11 @@
 .buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
 }
 
 button {
   font-size: 1.5em;
   padding: 20px;
   cursor: pointer;
+  flex: 1 0 25%;
 }
