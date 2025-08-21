@@ -36,23 +36,43 @@ let shouldResetDisplay = null;
 let btnNodeList = document.querySelectorAll("button");
 
 for (btn of btnNodeList) {
-  btn.addEventListener("click", (e) => console.log(e.target.textContent));
+  //btn.addEventListener("click", (e) => console.log(e.target.textContent));
+  btn.addEventListener("click", (e) => {
+    let result = logicFlow(e.target);
+    console.log(result);
+  });
 }
 
 function logicFlow(target) {
-  // check if event target is a number or an operator
-  if (target.className === "digit") {
-    // do something for digits
-    if (firstOperand === null) {
+  let targetContent = target.textContent;
+  let targetClass = target.className;
+  // if an operator has not been clicked yet then append or change firstOperand
+  // else change secondOperand or append to it
+
+  if (targetClass === "digit") {
+    if (currentOperator === null) {
+      if (firstOperand === null) {
+        firstOperand = targetContent;
+      } else {
+        // remember to string concat at this stage and not math add
+        firstOperand.concat(targetContent);
+      }
     } else {
-      //no need to check for second operand
+      if (secondOperand === null) {
+        secondOperand = targetContent;
+      } else {
+        // remember to string concat at this stage and not math add
+        secondOperand.concat(targetContent);
+      }
     }
-  } else if (target.className === "operator") {
+  } else if (targetClass === "operator") {
     //do something else for operators
     if (currentOperator === null) {
-      // do something
+      currentOperator = targetContent;
     } else {
-      // calculate something
+      return operate(currentOperator, firstOperand, secondOperand);
     }
   }
+
+  return `firstOperand = ${firstOperand}; \n secondOperand = ${secondOperand}; \n currentOperator = ${currentOperator};`;
 }
